@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexusHub | AI & Media Converter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at top right, #0d1b2a, #010811);
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glow-button {
+            position: relative;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+        }
+        .glow-button:hover {
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.8);
+            transform: translateY(-1px);
+        }
+        /* Custom scrollbar for chat */
+        .custom-scroll::-webkit-scrollbar {
+            width: 5px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: rgba(59, 130, 246, 0.3);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen flex flex-col md:flex-row overflow-x-hidden">
+
+    <aside class="w-full md:w-64 glass-panel border-r border-slate-800 flex flex-col p-6 space-y-8">
+        <div class="flex items-center space-x-3">
+            <div class="bg-blue-600 p-2.5 rounded-xl shadow-lg shadow-blue-500/30">
+                <i class="fa-solid fa-wand-magic-sparkles text-xl text-white"></i>
+            </div>
+            <span class="text-xl font-bold tracking-wide bg-gradient-to-r from-white via-blue-200 to-blue-400 bg-clip-text text-transparent">NexusHub</span>
+        </div>
+
+        <nav class="flex-1 space-y-2">
+            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider pl-2 mb-3">Tools</p>
+            <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-xl bg-blue-600/10 text-blue-400 border border-blue-500/20 font-medium transition-all">
+                <i class="fa-solid fa-square-sliders"></i>
+                <span>Workspace</span>
+            </a>
+            <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white transition-all">
+                <i class="fa-solid fa-history"></i>
+                <span>History</span>
+            </a>
+        </nav>
+
+        <div class="pt-4 border-t border-slate-800 text-xs text-slate-500 flex items-center justify-between">
+            <span>System Status</span>
+            <span class="flex items-center gap-1.5 text-emerald-400">
+                <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span> Online
+            </span>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col lg:flex-row p-4 md:p-8 gap-6 max-w-[1600px] mx-auto w-full">
+        
+        <section class="flex-1 space-y-6">
+            <header>
+                <h1 class="text-2xl md:text-3xl font-bold text-white">Smart Converter</h1>
+                <p class="text-sm text-slate-400 mt-1">Convert files cleanly with pixel-perfect output layout customization.</p>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                <div class="glass-panel p-6 rounded-2xl flex flex-col justify-between group hover:border-blue-500/40 transition-all duration-300">
+                    <div>
+                        <div class="h-10 w-10 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 mb-4">
+                            <i class="fa-solid fa-file-pdf text-lg"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-slate-200">Image to PDF</h3>
+                        <p class="text-xs text-slate-400 mt-1">Merge PNG, JPG, or WebP images into a single polished document.</p>
+                    </div>
+                    <label class="mt-6 border border-dashed border-slate-700 hover:border-purple-500/50 rounded-xl p-4 text-center cursor-pointer block bg-white/[0.01] transition-all">
+                        <input type="file" accept="image/*" multiple class="hidden">
+                        <i class="fa-solid fa-cloud-arrow-up text-slate-500 text-lg group-hover:text-purple-400 mb-1 transition-colors"></i>
+                        <span class="block text-xs font-medium text-slate-400">Upload Images</span>
+                    </label>
+                </div>
+
+                <div class="glass-panel p-6 rounded-2xl flex flex-col justify-between group hover:border-emerald-500/40 transition-all duration-300">
+                    <div>
+                        <div class="h-10 w-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 mb-4">
+                            <i class="fa-solid fa-file-image text-lg"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-slate-200">PDF to Image</h3>
+                        <p class="text-xs text-slate-400 mt-1">Extract high-resolution image frames from individual PDF pages.</p>
+                    </div>
+                    <label class="mt-6 border border-dashed border-slate-700 hover:border-emerald-500/50 rounded-xl p-4 text-center cursor-pointer block bg-white/[0.01] transition-all">
+                        <input type="file" accept=".pdf" class="hidden">
+                        <i class="fa-solid fa-cloud-arrow-up text-slate-500 text-lg group-hover:text-emerald-400 mb-1 transition-colors"></i>
+                        <span class="block text-xs font-medium text-slate-400">Upload PDF File</span>
+                    </label>
+                </div>
+
+            </div>
+
+            <div class="glass-panel p-6 rounded-2xl hover:border-blue-500/30 transition-all duration-300">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="h-10 w-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400">
+                        <i class="fa-solid fa-file-word text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-slate-200">Word to Custom Image</h3>
+                        <p class="text-xs text-slate-400">Convert document pages directly into styled image layouts.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                    <div class="md:col-span-2">
+                        <label class="border border-dashed border-slate-700 hover:border-blue-500/50 rounded-xl h-32 flex flex-col items-center justify-center cursor-pointer bg-white/[0.01] transition-all">
+                            <input type="file" accept=".doc,.docx" class="hidden">
+                            <i class="fa-solid fa-file-lines text-slate-500 text-2xl mb-2"></i>
+                            <span class="text-xs font-medium text-slate-300">Drop your .docx file here</span>
+                        </label>
+                    </div>
+                    
+                    <div class="space-y-3 bg-white/[0.02] p-3 rounded-xl border border-slate-800/60">
+                        <div>
+                            <label class="text-[11px] text-slate-400 font-medium uppercase block mb-1">Export Format</label>
+                            <select class="w-full bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-slate-300 focus:outline-none focus:border-blue-500">
+                                <option>PNG (Lossless)</option>
+                                <option>JPEG (Compact)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-[11px] text-slate-400 font-medium uppercase block mb-1">Resolution Quality</label>
+                            <select class="w-full bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-slate-300 focus:outline-none focus:border-blue-500">
+                                <option>Standard (1x)</option>
+                                <option>High-Res (2x)</option>
+                                <option>Ultra-HD (3x)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="w-full lg:w-[420px] flex flex-col glass-panel rounded-2xl border-blue-500/20 relative overflow-hidden h-[600px] lg:h-auto">
+            <div class="absolute -top-20 -right-20 h-40 w-40 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="p-4 border-b border-slate-800/80 flex items-center justify-between bg-white/[0.01]">
+                <div class="flex items-center space-x-3">
+                    <div class="relative">
+                        <div class="h-9 w-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-md">
+                            <i class="fa-solid fa-robot text-sm text-white"></i>
+                        </div>
+                        <span class="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-emerald-500 border-2 border-slate-900"></span>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-semibold text-white">Nexus Engine AI</h4>
+                        <p class="text-[10px] text-slate-400">Can write text, design prompts, or build files</p>
+                    </div>
+                </div>
+                <button class="text-xs bg-white/5 border border-slate-700 text-slate-300 px-2.5 py-1 rounded-lg hover:bg-white/10 transition-all">
+                    Clear
+                </button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-4 space-y-4 custom-scroll">
+                <div class="flex gap-3 max-w-[85%]">
+                    <div class="h-7 w-7 rounded-lg bg-blue-600/20 text-blue-400 flex items-center justify-center flex-shrink-0 text-xs">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <div class="bg-white/5 border border-slate-800/80 p-3 rounded-2xl rounded-tl-none text-xs text-slate-300 leading-relaxed">
+                        Hello! I am your embedded assistant. I can write creative content, brainstorm ideas, or generate targeted descriptive prompts for your external image engines. How can I help you today?
+                    </div>
+                </div>
+
+                <div class="flex gap-3 max-w-[85%] ml-auto justify-end">
+                    <div class="bg-blue-600 p-3 rounded-2xl rounded-tr-none text-xs text-white leading-relaxed shadow-md shadow-blue-600/10">
+                        Can you write a detailed image generator prompt for a sleek, modern workstation?
+                    </div>
+                </div>
+            </div>
+
+                <div class="p-4 border-t border-slate-800/80 bg-slate-950/40">
+                    <form id="chat-form" class="flex items-center gap-2 bg-slate-900/90 border border-slate-700/80 rounded-xl p-1.5 focus-within:border-blue-500/60 transition-all">
+                        <input id="chat-input" type="text" placeholder="Ask AI anything..." class="flex-1 bg-transparent border-none text-xs text-slate-200 px-2 py-1 focus:outline-none placeholder-slate-500" autocomplete="off">
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white h-8 w-8 rounded-lg flex items-center justify-center transition-colors glow-button">
+                            <i class="fa-solid fa-paper-plane text-xs"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+</body>
+</html>
