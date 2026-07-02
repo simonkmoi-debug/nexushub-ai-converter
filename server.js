@@ -132,3 +132,4 @@ app.post('/api/ai-chat', async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 NexusHub Server engine running on port ${PORT}`));
+module.exports = app;
