@@ -4,7 +4,7 @@ import path from 'path';
 import fs from 'fs/promises';
 import { PDFDocument } from 'pdf-lib';
 import { pdfToText } from 'pdf-to-text';
-import mammoth from 'mammoth-docx-converter';
+import mammoth from 'mammoth';
 import { GoogleGenAI } from '@google/genai';
 import dotenv from 'dotenv';
 
