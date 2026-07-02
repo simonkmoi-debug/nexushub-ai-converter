@@ -16,6 +16,6 @@
     "multer": "^2.2.0",
     "ngrok": "^5.0.0-beta.2",
     "pdf-lib": "^1.17.1",
-    "pdf-parse": "^2.4.5"
+    "pdf-to-text": "0.0.7"
   }
 }
