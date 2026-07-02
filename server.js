@@ -3,7 +3,7 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs/promises';
 import { PDFDocument } from 'pdf-lib';
-import pdfPoppler from 'pdf-poppler';
+import pdfImgConvert from 'pdf-img-convert';
 import mammoth from 'mammoth-docx-converter';
 import { GoogleGenAI } from '@google/genai';
 import dotenv from 'dotenv';
