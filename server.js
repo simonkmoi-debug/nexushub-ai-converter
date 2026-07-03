@@ -3,7 +3,6 @@ import multer from 'multer';
 import { fileURLToPath } from 'url';
 import fs from 'fs/promises';
 import { PDFDocument } from 'pdf-lib';
-import pdfToText from 'pdf-to-text';
 import mammoth from 'mammoth';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import path from 'path';
