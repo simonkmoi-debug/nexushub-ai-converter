@@ -5,7 +5,7 @@ import fs from 'fs/promises';
 import { PDFDocument } from 'pdf-lib';
 import { pdfToText } from 'pdf-to-text';
 import mammoth from 'mammoth';
-import { GoogleGenAI } from '@google/generative-ai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -17,7 +17,7 @@ app.use(express.json());
 app.use(express.static('public')); // Serves your frontend HTML
 
 // Initialize Gemini AI
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const ai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // ==========================================
 // 1. IMAGE TO PDF CONVERSION
