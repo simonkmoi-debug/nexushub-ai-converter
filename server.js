@@ -8,7 +8,7 @@ import mammoth from 'mammoth';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const app = express();
-const upload = multer({ dest: 'uploads/' });
+const upload = multer({ storage: multer.memoryStorage() });
 
 app.use(express.json());
 app.use(express.static('public')); // Serves your frontend HTML
