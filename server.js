@@ -12,6 +12,16 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 app.use(express.json());
 app.use(express.static('public')); // Serves your frontend HTML
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Explicitly serve your index.html file on the root web address
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 // Initialize Gemini AI
 const ai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
