@@ -6,9 +6,6 @@ import { PDFDocument } from 'pdf-lib';
 import { pdfToText } from 'pdf-to-text';
 import mammoth from 'mammoth';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 const app = express();
 const upload = multer({ dest: 'uploads/' });
