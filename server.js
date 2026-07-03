@@ -1,6 +1,6 @@
 import express from 'express';
 import multer from 'multer';
-import path from 'path';
+import { fileURLToPath } from 'url';
 import fs from 'fs/promises';
 import { PDFDocument } from 'pdf-lib';
 import { pdfToText } from 'pdf-to-text';
