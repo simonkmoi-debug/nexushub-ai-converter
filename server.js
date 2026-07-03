@@ -5,7 +5,7 @@ import fs from 'fs/promises';
 import { PDFDocument } from 'pdf-lib';
 import { pdfToText } from 'pdf-to-text';
 import mammoth from 'mammoth';
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenAI } from '@google/generative-ai';
 import dotenv from 'dotenv';
 
 dotenv.config();
