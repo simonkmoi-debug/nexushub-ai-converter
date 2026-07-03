@@ -26,7 +26,7 @@ app.post('/api/image-to-pdf', upload.array('images'), async (req, res) => {
         const pdfDoc = await PDFDocument.create();
 
         for (const file of req.files) {
-            const imageBytes = await fs.readFile(file.path);
+            const imageBytes = file.buffer;
             let image;
             
             // Check file type and embed accordingly
