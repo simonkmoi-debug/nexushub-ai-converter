@@ -6,13 +6,13 @@ import { PDFDocument } from 'pdf-lib';
 import { pdfToText } from 'pdf-to-text';
 import mammoth from 'mammoth';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import path from 'path';
 
 const app = express();
 const upload = multer({ storage: multer.memoryStorage() });
 
 app.use(express.json());
 app.use(express.static('public')); // Serves your frontend HTML
-import path from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
