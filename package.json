@@ -1,7 +1,7 @@
 {
   "name": "pdf",
   "version": "1.0.0",
-  "type": "server.js",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
