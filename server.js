@@ -1,43 +1,34 @@
 import express from 'express';
 import multer from 'multer';
-import { fileURLToPath } from 'url';
-import fs from 'fs/promises';
-import { PDFDocument } from 'pdf-lib';
-import mammoth from 'mammoth';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import path from 'path';
-
-const app = express();
-const upload = multer({ storage: multer.memoryStorage() });
-
-app.use(express.json());
-app.use(express.static('public')); // Serves your frontend HTML
-
+import fs from 'fs';
+import { PDFDocument } from 'pdf-lib';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import dotenv from 'dotenv';
+dotenv.config();
+import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Explicitly serve your index.html file on the root web address
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
+const app = express();
+const upload = multer({ dest: 'uploads/' });
 
-// Initialize Gemini AI
-const ai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.json());
 
-// ==========================================
-// 1. IMAGE TO PDF CONVERSION
-// ==========================================
-app.post('/api/image-to-pdf', upload.array('images'), async (req, res) => {
+// Main Image to PDF Converter Route
+app.post('/api/convert-images', upload.array('images'), async (req, res) => {
     try {
-        if (!req.files || req.files.length === 0) return res.status(400).send('No files uploaded.');
+        if (!req.files || !Array.isArray(req.files) || req.files.length === 0) {
+            return res.status(400).json({ error: "No files uploaded or wrong field name used." });
+        }
 
         const pdfDoc = await PDFDocument.create();
 
         for (const file of req.files) {
-            const imageBytes = file.buffer;
+            const imageBytes = fs.readFileSync(file.path);
             let image;
             
-            // Check file type and embed accordingly
             if (file.mimetype === 'image/png') {
                 image = await pdfDoc.embedPng(imageBytes);
             } else {
@@ -48,93 +39,28 @@ app.post('/api/image-to-pdf', upload.array('images'), async (req, res) => {
             page.drawImage(image, { x: 0, y: 0, width: image.width, height: image.height });
             
             // Clean up the temporary uploaded file
-            await fs.unlink(file.path);
+            fs.unlinkSync(file.path);
         }
 
         const pdfBytes = await pdfDoc.save();
-        res.contentType("application/pdf");
-        res.send(Buffer.from(pdfBytes));
-    } catch (error) {
-        res.status(500).send({ error: error.message });
-    }
-});
-
-// ==========================================
-// 2. PDF TO IMAGE CONVERSION
-// ==========================================
-app.post('/api/pdf-to-image', upload.single('pdf'), async (req, res) => {
-    try {
-        if (!req.file) return res.status(400).send('No PDF file uploaded.');
-
-        const outputDir = path.join('uploads', `${req.file.filename}-pages`);
-        await fs.mkdir(outputDir, { recursive: true });
-
-        const options = {
-            format: 'png',
-            out_dir: outputDir,
-            out_prefix: 'page',
-            page: 1 // Converts the first page as a showcase
-        };
-
-        await pdfPoppler.convert(req.file.path, options);
+        const fileName = `converted-${Date.now()}.pdf`;
+        const filePath = path.join(__dirname, 'public', fileName);
         
-        const convertedImagePath = path.join(outputDir, 'page-1.png');
-        const imageBuffer = await fs.readFile(convertedImagePath);
-
-        // Clean up everything
-        await fs.unlink(req.file.path);
-        await fs.rm(outputDir, { recursive: true, force: true });
-
-        res.contentType("image/png");
-        res.send(imageBuffer);
+        fs.unlinkSync(filePath);
+        res.json({ success: true, url: `/${fileName}`, name: fileName });
     } catch (error) {
-        res.status(500).send({ error: error.message });
+        console.error("Image to PDF error:", error);
+        res.status(500).json({ error: "Failed to convert images to PDF" });
     }
 });
 
-// ==========================================
-// 3. WORD TO IMAGE (VIA EXTRACTED HTML CONTEXT)
-// ==========================================
-app.post('/api/word-to-custom-image', upload.single('word'), async (req, res) => {
-    try {
-        if (!req.file) return res.status(400).send('No document uploaded.');
+// Initialize Gemini AI
+const ai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-        // Extract text/html layout from Docx using Mammoth
-        const result = await mammoth.convertToHtml({ path: req.file.path });
-        const htmlContent = result.value; 
-
-        await fs.unlink(req.file.path);
-
-        // Send back structural layout info for your client canvas to draw
-        res.json({ 
-            success: true, 
-            message: "Document parsed successfully.", 
-            htmlStructure: htmlContent 
-        });
-    } catch (error) {
-        res.status(500).send({ error: error.message });
-    }
-});
-
-// ==========================================
-// 4. CO-PILOT AI ENGINE (AI ASSISTANT & PROMPT GEN)
-// ==========================================
-app.post('/api/ai-chat', async (req, res) => {
-    const { message } = req.body;
-    if (!message) return res.status(400).send('Message is required.');
-
-    try {
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: message,
-        });
-
-        res.json({ response: response.text });
-    } catch (error) {
-        res.status(500).send({ error: error.message });
-    }
-});
-
+// Server Port configuration and Activation Listener
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 NexusHub Server engine running on port ${PORT}`));
-module.exports = app;
+app.listen(PORT, () => {
+    console.log(`Server is running smoothly on port ${PORT}`);
+});
+
+export default app;

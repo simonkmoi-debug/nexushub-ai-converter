@@ -80,7 +80,8 @@
             </header>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
+               
+                <form action="/api/convert-images" method="POST" enctype="multipart/form-data">
                 <div class="glass-panel p-6 rounded-2xl flex flex-col justify-between group hover:border-blue-500/40 transition-all duration-300">
                     <div>
                         <div class="h-10 w-10 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 mb-4">
@@ -94,7 +95,11 @@
                         <i class="fa-solid fa-cloud-arrow-up text-slate-500 text-lg group-hover:text-purple-400 mb-1 transition-colors"></i>
                         <span class="block text-xs font-medium text-slate-400">Upload Images</span>
                     </label>
+                    <button type="submit" class="mt-4 w-full bg-blue-600 text-white py-2 rounded-xl hover:bg-blue-700">
+                        Convert Images to PDF
+                    </button>
                 </div>
+                </form>
 
                 <div class="glass-panel p-6 rounded-2xl flex flex-col justify-between group hover:border-emerald-500/40 transition-all duration-300">
                     <div>
@@ -192,6 +197,30 @@
                 </div>
             </div>
 
+            <div class="converter-box">
+                <h2>Image to PDF Hub</h2>
+                
+                <!-- Multi-upload and Camera Access Input Combo -->
+                <input type="file" id="imageInput" accept="image/*" multiple style="display:none;">
+                
+                <div class="button-group">
+                    <button onclick="document.getElementById('imageInput').click()">📁 Select Images</button>
+                    <!-- The 'capture' attribute opens the device camera natively -->
+                    <button onclick="openCamera()">📸 Take Photo</button>
+                </div>
+            
+                <!-- Preview Container showing files ready to convert -->
+                <div id="previewArea" style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;"></div>
+            
+                <button id="convertBtn" onclick="processConversion()" style="margin-top:20px; display:none;">Transform to PDF</button>
+            
+                <hr>
+                
+                <!-- Saved History List Display -->
+                <h3>Conversion History</h3>
+                <ul id="historyList"></ul>
+            </div>
+
                 <div class="p-4 border-t border-slate-800/80 bg-slate-950/40">
                     <form id="chat-form" class="flex items-center gap-2 bg-slate-900/90 border border-slate-700/80 rounded-xl p-1.5 focus-within:border-blue-500/60 transition-all">
                         <input id="chat-input" type="text" placeholder="Ask AI anything..." class="flex-1 bg-transparent border-none text-xs text-slate-200 px-2 py-1 focus:outline-none placeholder-slate-500" autocomplete="off">
@@ -204,6 +233,132 @@
         </section>
 
     </main>
+
+    <script type="module">
+        let selectedFiles = [];
+
+// Handle input file selections
+document.getElementById('imageInput').addEventListener('change', (e) => {
+    const files = Array.from(e.target.files);
+    addFilesToQueue(files);
+});
+
+// Dynamic camera action trigger
+function openCamera() {
+    const camInput = document.createElement('input');
+    camInput.type = 'file';
+    camInput.accept = 'image/*';
+    camInput.capture = 'environment'; // Explicitly requests back camera on phones
+    camInput.onchange = (e) => {
+        if(e.target.files.length > 0) {
+            addFilesToQueue([e.target.files[0]]);
+        }
+    };
+    camInput.click();
+}
+
+function addFilesToQueue(files) {
+    selectedFiles = selectedFiles.concat(files);
+    renderPreviews();
+}
+
+function renderPreviews() {
+    const previewArea = document.getElementById('previewArea');
+    previewArea.innerHTML = '';
+    
+    selectedFiles.forEach((file, index) => {
+        const img = document.createElement('img');
+        img.src = URL.createObjectURL(file);
+        img.style.width = '70px';
+        img.style.height = '70px';
+        img.style.objectFit = 'cover';
+        img.style.borderRadius = '5px';
+        previewArea.appendChild(img);
+    });
+
+    document.getElementById('convertBtn').style.display = selectedFiles.length > 0 ? 'block' : 'none';
+}
+
+// Upload arrays via Multipart FormData fetch requests
+async function processConversion() {
+    if (selectedFiles.length === 0) return;
+
+    const formData = new FormData();
+    selectedFiles.forEach(file => {
+        formData.append('images', file);
+    });
+
+    try {
+        const response = await fetch('/api/convert-images', {
+            method: 'POST',
+            body: formData
+        });
+        const data = await response.json();
+
+        if (data.success) {
+            saveToHistory(data.name, data.url);
+            selectedFiles = [];
+            renderPreviews();
+            alert("PDF generated successfully!");
+        } else {
+            alert("Error: " + data.error);
+        }
+    } catch (err) {
+        console.error(err);
+        alert("Server communication failure.");
+    }
+}
+
+// Local history indexing engine
+function saveToHistory(name, url) {
+    let history = JSON.parse(localStorage.getItem('pdf_history')) || [];
+    history.unshift({ name, url, date: new Date().toLocaleString() });
+    localStorage.setItem('pdf_history', JSON.stringify(history));
+    displayHistory();
+}
+
+function displayHistory() {
+    const historyList = document.getElementById('historyList');
+    const history = JSON.parse(localStorage.getItem('pdf_history')) || [];
+    historyList.innerHTML = '';
+
+    history.forEach(item => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+            <div>
+                <strong>${item.name}</strong> <small>(${item.date})</small>
+                <br>
+                <a href="${item.url}" target="_blank">📥 Open/Download</a> | 
+                <button onclick="shareDocument('${item.name}', '${item.url}')">🔗 Share</button>
+            </div>
+        `;
+        historyList.appendChild(li);
+    });
+}
+
+// Global cross-app routing distribution (WhatsApp, Drive, System Share)
+async function shareDocument(title, url) {
+    const fullUrl = window.location.origin + url;
+    if (navigator.share) {
+        try {
+            await navigator.share({
+                title: title,
+                text: 'Check out my converted document!',
+                url: fullUrl,
+            });
+        } catch (err) {
+            console.log("Sharing cancelled or blocked");
+        }
+    } else {
+        // Fallback for desktop browsers without Web Share compatibility
+        const encodedUrl = encodeURIComponent(fullUrl);
+        window.open(`https://api.whatsapp.com/send?text=Here is my PDF: ${encodedUrl}`, '_blank');
+    }
+}
+
+// Render history entries automatically on app initialization
+window.onload = displayHistory;
+</script>
 
 </body>
 </html>
