@@ -30,19 +30,29 @@ function findIndexHtml(dir) {
     return null;
 }
 
-app.use(express.static(__dirname));
-
-app.get('/', (req, res) => {
-    const targetFile = findIndexHtml(__dirname);
-    if (targetFile) {
+// Automatically find where index.html is located in your project workspace
+const targetFile = findIndexHtml(__dirname);
+if (targetFile) {
+    // Dynamically tell Express to serve styles and assets from that specific folder
+    const targetDir = path.dirname(targetFile);
+    app.use(express.static(targetDir));
+    
+    // Serve the main website page
+    app.get('/', (req, res) => {
         res.sendFile(targetFile);
-    } else {
+    });
+} else {
+    // Fallback if index.html disappears
+    app.use(express.static(__dirname));
+    app.get('/', (req, res) => {
         res.status(404).send("Could not locate index.html in workspace");
-    }
-});
+    });
+}
 
+// Make sure your backend can parse incoming JSON data correctly
 app.use(express.json());
-
+// Serve generated PDFs straight from the root project folder
+app.use(express.static(__dirname));
 // Main Image to PDF Converter Route
 app.post('/api/convert-images', upload.array('images'), async (req, res) => {
     try {
