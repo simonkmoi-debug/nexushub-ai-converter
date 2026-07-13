@@ -54,10 +54,11 @@ app.use(express.json());
 // Serve generated PDFs straight from the root project folder
 app.use(express.static(__dirname));
 // Main Image to PDF Converter Route
+// Main Image to PDF Converter Route
 app.post('/api/convert-images', upload.array('images'), async (req, res) => {
     try {
         if (!req.files || !Array.isArray(req.files) || req.files.length === 0) {
-            return res.status(400).json({ error: "No files uploaded or wrong field name used." });
+            return res.status(400).json({ error: "No files uploaded" });
         }
 
         const pdfDoc = await PDFDocument.create();
@@ -65,28 +66,37 @@ app.post('/api/convert-images', upload.array('images'), async (req, res) => {
         for (const file of req.files) {
             const imageBytes = fs.readFileSync(file.path);
             let image;
-            
-            if (file.mimetype === 'image/png') {
+
+            if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/jpg') {
+                image = await pdfDoc.embedJpg(imageBytes);
+            } else if (file.mimetype === 'image/png') {
                 image = await pdfDoc.embedPng(imageBytes);
             } else {
-                image = await pdfDoc.embedJpg(imageBytes);
+                // Clean up unknown file types immediately from memory/disk
+                if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+                continue;
             }
 
             const page = pdfDoc.addPage([image.width, image.height]);
             page.drawImage(image, { x: 0, y: 0, width: image.width, height: image.height });
-            
-            // Clean up the temporary uploaded file
-            fs.unlinkSync(file.path);
+
+            // Clean up the temporary uploaded image from disk
+            if (fs.existsSync(file.path)) {
+                fs.unlinkSync(file.path);
+            }
         }
 
         const pdfBytes = await pdfDoc.save();
-const fileName = `converted-${Date.now()}.pdf`;
-const filePath = path.join(__dirname, fileName);
+        const fileName = `converted-${Date.now()}.pdf`;
+        const filePath = path.join(__dirname, fileName);
 
-// This saves the actual PDF file to the folder so the user can download it
-fs.writeFileSync(filePath, pdfBytes);
+        // Keep this line to write the PDF bytes onto the server disk
+        fs.writeFileSync(filePath, pdfBytes);
 
-res.json({ success: true, url: `/${fileName}`, name: fileName });
+        // Return successful down link to client application frame
+        res.json({ success: true, url: `/${fileName}`, name: fileName });
+
+    } catch (error) {
         console.error("Image to PDF error:", error);
         res.status(500).json({ error: "Failed to convert images to PDF" });
     }
