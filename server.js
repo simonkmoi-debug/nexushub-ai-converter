@@ -30,16 +30,17 @@ function findIndexHtml(dir) {
     return null;
 }
 
+// Express middleware to serve static files (like PDFs and styles) directly from the root folder
+app.use(express.static(__dirname));
+
+// Single main route to find and serve index.html automatically
 app.get('/', (req, res) => {
     const targetFile = findIndexHtml(__dirname);
     if (targetFile) {
         return res.sendFile(targetFile);
     }
-    res.status(404).send("Could not locate index.html in workspace.");
+    res.status(404).send("Could not locate index.html in workspace");
 });
-
-app.get('/', (req, res) => {
-    const targetFile = findIndexHtml(__dirname);
     if (targetFile) {
         return res.sendFile(targetFile);
     }
@@ -74,12 +75,13 @@ app.post('/api/convert-images', upload.array('images'), async (req, res) => {
         }
 
         const pdfBytes = await pdfDoc.save();
-        const fileName = `converted-${Date.now()}.pdf`;
-        const filePath = path.join(__dirname, 'public', fileName);
-        
-        fs.unlinkSync(filePath);
-        res.json({ success: true, url: `/${fileName}`, name: fileName });
-    } catch (error) {
+const fileName = `converted-${Date.now()}.pdf`;
+const filePath = path.join(__dirname, fileName);
+
+// This saves the actual PDF file to the folder so the user can download it
+fs.writeFileSync(filePath, pdfBytes);
+
+res.json({ success: true, url: `/${fileName}`, name: fileName });
         console.error("Image to PDF error:", error);
         res.status(500).json({ error: "Failed to convert images to PDF" });
     }
