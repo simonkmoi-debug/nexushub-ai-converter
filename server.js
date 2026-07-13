@@ -30,22 +30,17 @@ function findIndexHtml(dir) {
     return null;
 }
 
-// Express middleware to serve static files (like PDFs and styles) directly from the root folder
 app.use(express.static(__dirname));
 
-// Single main route to find and serve index.html automatically
 app.get('/', (req, res) => {
     const targetFile = findIndexHtml(__dirname);
     if (targetFile) {
-        return res.sendFile(targetFile);
+        res.sendFile(targetFile);
+    } else {
+        res.status(404).send("Could not locate index.html in workspace");
     }
-    res.status(404).send("Could not locate index.html in workspace");
 });
-    if (targetFile) {
-        return res.sendFile(targetFile);
-    }
-    res.status(404).send("Could not locate index.html in workspace.");
-});
+
 app.use(express.json());
 
 // Main Image to PDF Converter Route
