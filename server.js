@@ -13,8 +13,6 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const upload = multer({ dest: 'uploads/' });
 
-import fs from 'fs';
-
 // Tricky fix: Automatically find index.html anywhere in the workspace
 function findIndexHtml(dir) {
     const files = fs.readdirSync(dir);
