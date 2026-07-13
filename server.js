@@ -13,7 +13,7 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const upload = multer({ dest: 'uploads/' });
 
-app.use(express.static('AI tools public/public'));
+app.use(express.static(path.join(__dirname, 'AI tools \ public')));
 app.use(express.json());
 
 // Main Image to PDF Converter Route
