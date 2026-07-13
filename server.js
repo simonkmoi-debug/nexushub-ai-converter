@@ -13,8 +13,24 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const upload = multer({ dest: 'uploads/' });
 
+import fs from 'fs';
+
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'AI tools\ public', 'index.html'));
+    // Tricky fix: Look everywhere for index.html automatically
+    const pathsToTry = [
+        path.join(__dirname, 'AI tools \ public', 'index.html'),
+        path.join(__dirname, 'AI tools \ public/public', 'index.html'),
+        path.join(__dirname, 'public', 'index.html'),
+        './AI tools \ public/index.html',
+        './AI tools \ public/public/index.html'
+    ];
+
+    for (const targetPath of pathsToTry) {
+        if (fs.existsSync(targetPath)) {
+            return res.sendFile(path.resolve(targetPath));
+        }
+    }
+    res.status(404).send("Server is live, but looking for index.html location.");
 });
 app.use(express.json());
 
