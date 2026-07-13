@@ -15,22 +15,37 @@ const upload = multer({ dest: 'uploads/' });
 
 import fs from 'fs';
 
-app.get('/', (req, res) => {
-    // Tricky fix: Look everywhere for index.html automatically
-    const pathsToTry = [
-        path.join(__dirname, 'AI tools \ public', 'index.html'),
-        path.join(__dirname, 'AI tools \ public/public', 'index.html'),
-        path.join(__dirname, 'public', 'index.html'),
-        './AI tools \ public/index.html',
-        './AI tools \ public/public/index.html'
-    ];
-
-    for (const targetPath of pathsToTry) {
-        if (fs.existsSync(targetPath)) {
-            return res.sendFile(path.resolve(targetPath));
+// Tricky fix: Automatically find index.html anywhere in the workspace
+function findIndexHtml(dir) {
+    const files = fs.readdirSync(dir);
+    for (const file of files) {
+        const fullPath = path.join(dir, file);
+        if (file === 'node_modules' || file === '.git') continue;
+        
+        if (fs.statSync(fullPath).isDirectory()) {
+            const found = findIndexHtml(fullPath);
+            if (found) return found;
+        } else if (file === 'index.html') {
+            return fullPath;
         }
     }
-    res.status(404).send("Server is live, but looking for index.html location.");
+    return null;
+}
+
+app.get('/', (req, res) => {
+    const targetFile = findIndexHtml(__dirname);
+    if (targetFile) {
+        return res.sendFile(targetFile);
+    }
+    res.status(404).send("Could not locate index.html in workspace.");
+});
+
+app.get('/', (req, res) => {
+    const targetFile = findIndexHtml(__dirname);
+    if (targetFile) {
+        return res.sendFile(targetFile);
+    }
+    res.status(404).send("Could not locate index.html in workspace.");
 });
 app.use(express.json());
 
